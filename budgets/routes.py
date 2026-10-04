@@ -17,10 +17,12 @@ def budgets_page():
         flash(str(err), "error")
         return redirect(url_for("budgets.budgets_page"))
 
+    conn = get_db()
     return render_template(
         "budgets.html",
         month=month,
-        rows=service.budget_status(get_db(), month),
+        rows=service.budget_status(conn, month),
+        unbudgeted=service.unbudgeted_spending(conn, month),
     )
 
 
@@ -51,4 +53,9 @@ def api_status():
         month = parse_month(request.args.get("month"))
     except ValidationError as err:
         return jsonify(error=str(err)), 400
-    return jsonify(month=month, budgets=service.budget_status(get_db(), month))
+    conn = get_db()
+    return jsonify(
+        month=month,
+        budgets=service.budget_status(conn, month),
+        unbudgeted=service.unbudgeted_spending(conn, month),
+    )

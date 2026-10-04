@@ -52,4 +52,16 @@
   <p class="muted">No budgets yet. Add one above, e.g. groceries / 300.</p>
   {% endif %}
 </section>
+
+{% if unbudgeted %}
+<section class="card">
+  <h2>Spending without a budget</h2>
+  <ul class="totals">
+    {% for category, cents in unbudgeted.items() %}
+    <li><span>{{ category }}</span><span class="amount">€{{ cents|money }}</span></li>
+    {% endfor %}
+  </ul>
+  <p class="muted">Add a budget for these categories if you want to track them.</p>
+</section>
+{% endif %}
 {% endblock %}

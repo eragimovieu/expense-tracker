@@ -68,3 +68,16 @@ def budget_status(conn, month):
             }
         )
     return report
+
+
+def unbudgeted_spending(conn, month):
+    """Categories with spending this month but no budget, e.g. {'taxi': 1200}.
+    Shown on the budgets page so new categories don't go unnoticed."""
+    month = parse_month(month)
+    budgeted = {budget["category"] for budget in list_budgets(conn)}
+    spent_by_category = expenses_service.totals_by_category(conn, month)
+    return {
+        category: cents
+        for category, cents in spent_by_category.items()
+        if category not in budgeted
+    }

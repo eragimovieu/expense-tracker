@@ -82,3 +82,19 @@ def test_budget_status_with_no_budgets_is_empty(conn):
 def test_budget_status_rejects_bad_month(conn):
     with pytest.raises(ValidationError):
         service.budget_status(conn, "September")
+
+
+def test_unbudgeted_spending_lists_only_categories_without_a_budget(conn):
+    service.set_budget(conn, "groceries", "100")
+    expenses_service.add_expense(conn, "40", "groceries", "", "2026-09-02")
+    expenses_service.add_expense(conn, "12", "Taxi", "", "2026-09-03")
+    expenses_service.add_expense(conn, "3", "taxi", "", "2026-09-04")
+    expenses_service.add_expense(conn, "9", "cinema", "", "2026-08-30")  # other month
+
+    assert service.unbudgeted_spending(conn, "2026-09") == {"taxi": 1500}
+
+
+def test_unbudgeted_spending_is_empty_when_everything_has_a_budget(conn):
+    service.set_budget(conn, "coffee", "20")
+    expenses_service.add_expense(conn, "3", "coffee", "", "2026-09-01")
+    assert service.unbudgeted_spending(conn, "2026-09") == {}

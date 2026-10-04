@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Expense Tracker{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Expense Tracker</span>
+    <nav>
+      <a href="{{ url_for('expenses.expenses_page', month=month) }}"
+         {% if request.endpoint == 'expenses.expenses_page' %}class="active"{% endif %}>Expenses</a>
+    </nav>
+  </header>
+
+  <main>
+    {% if month %}
+    <div class="month-nav">
+      <a href="{{ request.path }}?month={{ shift_month(month, -1) }}" aria-label="Previous month">&larr;</a>
+      <h1>{{ month|month_label }}</h1>
+      <a href="{{ request.path }}?month={{ shift_month(month, 1) }}" aria-label="Next month">&rarr;</a>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for kind, text in messages %}
+        <p class="flash flash-{{ kind }}">{{ text }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

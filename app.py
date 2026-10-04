@@ -4,6 +4,7 @@ import os
 from flask import Flask, redirect, url_for
 
 import db
+from budgets.routes import bp as budgets_bp
 from config import load_config
 from expenses.routes import bp as expenses_bp
 from utils import format_money, month_label, shift_month
@@ -23,6 +24,7 @@ def create_app():
 
     # Each feature domain is a blueprint with its own routes.
     app.register_blueprint(expenses_bp)
+    app.register_blueprint(budgets_bp)
 
     # Helpers the templates can use: {{ cents|money }}, {{ month|month_label }}
     app.add_template_filter(format_money, "money")

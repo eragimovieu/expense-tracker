@@ -103,7 +103,18 @@ th { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
 .flash-success { background: #e6f2ee; color: var(--ok); }
 .flash-error { background: #fbe9e7; color: var(--over); }
 
+/* Budget usage bars */
+.usage { min-width: 160px; }
+.bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--ok); }
+.status-warning .bar span { background: var(--warn); }
+.status-over .bar span { background: var(--over); }
+.status-over td:first-child { color: var(--over); font-weight: 600; }
+.usage small { color: var(--muted); }
+
 @media (max-width: 600px) {
   table { font-size: 0.9rem; }
-  th:nth-child(3), td:nth-child(3) { display: none; } /* hide description on phones */
+  th:nth-child(3), td:nth-child(3) { display: none; } /* hide description / limit on phones */
+  .usage { min-width: 0; width: 40%; }
+  th, td { padding: 8px 4px; }
 }

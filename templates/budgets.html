@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Budgets · {{ month|month_label }}{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>Set a monthly budget</h2>
+  <form method="post" action="{{ url_for('budgets.save_budget') }}" class="form-grid">
+    <input type="hidden" name="month" value="{{ month }}">
+    <label>Category
+      <input name="category" placeholder="groceries" maxlength="40" required>
+    </label>
+    <label>Limit per month (€)
+      <input name="monthly_limit" inputmode="decimal" placeholder="300" required>
+    </label>
+    <button type="submit">Save budget</button>
+  </form>
+  <p class="muted">Saving a category that already has a budget changes its limit.</p>
+</section>
+
+<section class="card">
+  <h2>Budgets for {{ month|month_label }}</h2>
+  {% if rows %}
+  <table>
+    <thead>
+      <tr><th>Category</th><th class="num">Spent</th><th class="num">Limit</th><th>Used</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr class="status-{{ row.status }}">
+        <td>{{ row.category }}</td>
+        <td class="num">€{{ row.spent_cents|money }}</td>
+        <td class="num">€{{ row.limit_cents|money }}</td>
+        <td class="usage">
+          <div class="bar"><span style="width: {{ [row.percent_used, 100]|min }}%"></span></div>
+          <small>
+            {{ row.percent_used }}% ·
+            {% if row.status == 'over' %}€{{ (-row.remaining_cents)|money }} over
+            {% else %}€{{ row.remaining_cents|money }} left{% endif %}
+          </small>
+        </td>
+        <td class="num">
+          <form method="post" action="{{ url_for('budgets.delete_budget', budget_id=row.id) }}">
+            <input type="hidden" name="month" value="{{ month }}">
+            <button type="submit" class="link-button">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No budgets yet. Add one above, e.g. groceries / 300.</p>
+  {% endif %}
+</section>
+{% endblock %}

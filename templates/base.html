@@ -12,6 +12,8 @@
     <nav>
       <a href="{{ url_for('expenses.expenses_page', month=month) }}"
          {% if request.endpoint == 'expenses.expenses_page' %}class="active"{% endif %}>Expenses</a>
+      <a href="{{ url_for('budgets.budgets_page', month=month) }}"
+         {% if request.endpoint == 'budgets.budgets_page' %}class="active"{% endif %}>Budgets</a>
     </nav>
   </header>
 

@@ -43,19 +43,3 @@ Context: Realistically, several flatmates would each want their own expenses. Bu
 Decision: Don't build authentication. The first version is a single-user app that each person runs for themselves.
 Alternatives considered: Flask-Login with a simple users table, rejected because it adds dependencies, a third domain both others would depend on, and security work (password storage, CSRF on every form) that I couldn't do properly in this assignment. HTTP basic auth through one environment variable password, rejected because it protects the app but still doesn't separate one flatmate's data from another's.
 Consequences: Anyone who can reach the app can see and change all data, so it must not be exposed publicly until auth exists. Adding it later means a `user_id` column on both tables and a users service; I'd probably do that once the domains are split in Assignment 2.
-
-## 4. Unit-test the service layer hard, smoke-test the routes
-Date: 2026-10-04
-Status: Decided
-Context: The brief asks for at least 70% coverage of the core business logic, and I had limited time. The logic that can actually get money wrong (parsing amounts, monthly totals, the 80% / over-budget rules) lives in `expenses/service.py`, `budgets/service.py` and `utils.py`, not in the Flask routes.
-Decision: Write pytest unit tests that call the service functions directly against a fresh in-memory SQLite database (the `conn` fixture), aiming at full coverage there, including edge cases like exactly 80%, exactly at the limit, and "0.29" not becoming 28 cents. Routes only get a handful of smoke tests through Flask's test client.
-Alternatives considered: Testing everything through HTTP requests with the test client. It would cover the routes as well, but every failure would be harder to trace, the tests would be slower, and checking a threshold like 80% through rendered HTML is clumsy. Mocking the database was also rejected: an in-memory SQLite runs the real SQL and is just as fast.
-Consequences: Coverage on the services is close to 100% and the tests run in under a second. Thinner areas: templates and the `if __name__ == "__main__"` block aren't tested, and some error branches in the routes (a bad `month` on the HTML pages, an invalid budget form, deleting something that's already gone) are only checked by hand.
-
-## 5. No login or user accounts (for now)
-Date: 2026-10-04
-Status: Decided
-Context: Realistically, several flatmates would each want their own expenses. But adding accounts means a `users` table, password hashing, sessions, and a `user_id` column on both `expenses` and `budgets`, which would tie both domains to a third one before the first version works.
-Decision: Don't build authentication. The first version is a single-user app that each person runs for themselves.
-Alternatives considered: Flask-Login with a simple users table, rejected because it adds dependencies, a third domain both others would depend on, and security work (password storage, CSRF on every form) that I couldn't do properly in this assignment. HTTP basic auth through one environment variable password, rejected because it protects the app but still doesn't separate one flatmate's data from another's.
-Consequences: Anyone who can reach the app can see and change all data, so it must not be exposed publicly until auth exists. Adding it later means a `user_id` column on both tables and a users service; I'd probably do that once the domains are split in Assignment 2.

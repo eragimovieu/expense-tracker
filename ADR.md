@@ -12,6 +12,14 @@ Alternatives considered: Django, rejected because its ORM, admin, auth and migra
 
 Consequences: Only one runtime dependency (Flask), and blueprints give each domain its own folder. The cost is that I write the SQL and the input validation myself, with no library to help.
 
+## 2. Expenses and budgets as two separate modules with one seam
+Date: 2026-10-04
+Status: Decided
+Context: The brief says each domain should be able to become its own service later. Budgets can't do anything useful without knowing what was spent, so the two domains have to exchange data somehow, and I want that to happen in exactly one place.
+Decision: Each domain is its own package (`expenses/`, `budgets/`) with a `service.py` (logic plus SQL for its own table only) and a `routes.py` (a Flask blueprint). The budgets domain gets spending only by calling `expenses.service.totals_by_category(conn, month)`, and the same data is exposed as JSON at `GET /api/expenses/totals?month=YYYY-MM`.
+Alternatives considered: One `models.py` and one `routes.py` for the whole app. It's less code today, but budget code would end up querying the expenses table directly, and splitting it later would mean untangling it. I also considered having budgets call the expenses HTTP API even now, but making HTTP calls from the app to itself adds error handling and slowness with no benefit while it's one process.
+Consequences: Splitting later means replacing one function call in `budgets/service.py` with an HTTP call to `/api/expenses/totals`; the rest of budgets stays the same. The cost is that helpers both domains need (`utils.py`) will have to be copied into each service.
+
 ## 3. Each domain owns one table, linked only by category name
 Date: 2026-10-03
 Status: Decided

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expenses · Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Expense Tracker</span>
+    <nav>
+      <a id="nav-expenses" class="active" href="index.html">Expenses</a>
+      <a id="nav-budgets" href="budgets.html">Budgets</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="month-nav">
+      <a id="prev-month" href="#" aria-label="Previous month">&larr;</a>
+      <h1 id="month-title">Expenses</h1>
+      <a id="next-month" href="#" aria-label="Next month">&rarr;</a>
+    </div>
+
+    <p id="message" class="flash" hidden></p>
+    <p id="loading" class="muted" hidden></p>
+
+    <section class="card">
+      <h2>Add an expense</h2>
+      <form id="expense-form" class="form-grid">
+        <label>Amount (€)
+          <input name="amount" inputmode="decimal" placeholder="12.50" required>
+        </label>
+        <label>Category
+          <input name="category" list="category-list" placeholder="groceries" maxlength="40" required>
+        </label>
+        <label>Date
+          <input type="date" name="spent_on">
+        </label>
+        <label class="wide">Description
+          <input name="description" maxlength="200" placeholder="optional">
+        </label>
+        <button type="submit">Add expense</button>
+      </form>
+      <datalist id="category-list"></datalist>
+    </section>
+
+    <section class="card">
+      <h2>Spent this month <span id="month-total" class="amount"></span></h2>
+      <ul id="totals" class="totals"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Expenses</h2>
+      <table id="expenses-table" hidden>
+        <thead>
+          <tr><th>Date</th><th>Category</th><th>Description</th><th class="num">Amount</th><th></th></tr>
+        </thead>
+        <tbody id="expenses-body"></tbody>
+      </table>
+      <p id="no-expenses" class="muted" hidden></p>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="expenses.js"></script>
+</body>
+</html>

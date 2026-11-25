@@ -1,4 +1,4 @@
-/* Plain, readable styles. No framework on purpose (keeps dependencies at zero). */
+/* Plain, readable styles, carried over from the A1 templates. No framework. */
 :root {
   --bg: #f6f5f2;
   --card: #ffffff;
@@ -118,3 +118,9 @@ th { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
   .usage { min-width: 0; width: 40%; }
   th, td { padding: 8px 4px; }
 }
+
+/* Added for the static UI in A2 */
+button:disabled { opacity: 0.6; cursor: wait; }
+.flash-warning { background: #fdf3e1; color: var(--warn); }
+.flash-warning .link-button { color: var(--warn); text-decoration: underline; }
+.status-unknown td:first-child { color: var(--muted); }

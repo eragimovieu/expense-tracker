@@ -1,0 +1,6 @@
+# Runtime dependencies of the budgets service, pinned so every image build
+# installs exactly the same versions. requests is for the call to expenses.
+Flask==3.1.3
+gunicorn==23.0.0
+pymssql==2.3.4
+requests==2.32.4

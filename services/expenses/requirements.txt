@@ -1,0 +1,5 @@
+# Runtime dependencies of the expenses service, pinned so every image build
+# installs exactly the same versions.
+Flask==3.1.3
+gunicorn==23.0.0
+pymssql==2.3.4

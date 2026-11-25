@@ -1,0 +1,85 @@
+# The whole system on one machine:  docker compose up --build
+#
+#   UI        http://localhost:8080   (nginx serving ui/, not a service container)
+#   expenses  http://localhost:8001
+#   budgets   http://localhost:8002
+#   SQL Server localhost:1433         (one database per service)
+#
+# The passwords in this file only exist inside this local, throwaway SQL Server
+# container. Nothing on Azure uses them: the Azure passwords are GitHub secrets.
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64  # no ARM image; on Apple Silicon this runs with Rosetta
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "LocalDev-Sa-Password-1"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql  # data survives docker compose down (but not down -v)
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q 'SELECT 1' -o /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # Runs db/init.sql once and exits. The services wait until it finished.
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      SQLCMDPASSWORD: "LocalDev-Sa-Password-1"  # sqlcmd reads the sa password from here
+      EXPENSES_DB_PASSWORD: "LocalDev-Expenses-1"
+      BUDGETS_DB_PASSWORD: "LocalDev-Budgets-1"
+    volumes:
+      - ./db:/db:ro
+    entrypoint: ["/opt/mssql-tools18/bin/sqlcmd", "-S", "sqlserver", "-U", "sa", "-C", "-b", "-i", "/db/init.sql"]
+    restart: "no"
+
+  expenses:
+    build: ./services/expenses
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      PORT: "8001"
+      DATABASE_URL: "mssql://expenses_app:LocalDev-Expenses-1@sqlserver:1433/expenses"
+      CORS_ORIGINS: "http://localhost:8080,http://127.0.0.1:8080"
+      GIT_SHA: "local"
+    ports:
+      - "8001:8001"
+
+  budgets:
+    build: ./services/budgets
+    # No depends_on expenses on purpose: budgets has to start and keep
+    # working when expenses is down (ADR-6).
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      PORT: "8002"
+      DATABASE_URL: "mssql://budgets_app:LocalDev-Budgets-1@sqlserver:1433/budgets"
+      EXPENSES_URL: "http://expenses:8001"
+      EXPENSES_TIMEOUT_S: "3"
+      CORS_ORIGINS: "http://localhost:8080,http://127.0.0.1:8080"
+      GIT_SHA: "local"
+    ports:
+      - "8002:8002"
+
+  # Static files only, stock image, no Dockerfile. The browser calls the two
+  # services directly, using the URLs in ui/config.js.
+  ui:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./ui:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+
+volumes:
+  sqldata:

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Budgets · Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Expense Tracker</span>
+    <nav>
+      <a id="nav-expenses" href="index.html">Expenses</a>
+      <a id="nav-budgets" class="active" href="budgets.html">Budgets</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="month-nav">
+      <a id="prev-month" href="#" aria-label="Previous month">&larr;</a>
+      <h1 id="month-title">Budgets</h1>
+      <a id="next-month" href="#" aria-label="Next month">&rarr;</a>
+    </div>
+
+    <p id="message" class="flash" hidden></p>
+    <p id="loading" class="muted" hidden></p>
+
+    <section class="card">
+      <h2>Set a monthly budget</h2>
+      <form id="budget-form" class="form-grid">
+        <label>Category
+          <input name="category" placeholder="groceries" maxlength="40" required>
+        </label>
+        <label>Limit per month (€)
+          <input name="monthly_limit" inputmode="decimal" placeholder="300" required>
+        </label>
+        <button type="submit">Save budget</button>
+      </form>
+      <p class="muted">Saving a category that already has a budget changes its limit.</p>
+    </section>
+
+    <div id="spending-notice" class="flash flash-warning" hidden>
+      Spending isn't available right now: the expenses service didn't answer.
+      Your limits are shown without totals.
+      <button id="retry" type="button" class="link-button">Try again</button>
+    </div>
+
+    <section class="card">
+      <h2 id="budgets-title">Budgets</h2>
+      <table id="budgets-table" hidden>
+        <thead>
+          <tr><th>Category</th><th class="num">Spent</th><th class="num">Limit</th><th>Used</th><th></th></tr>
+        </thead>
+        <tbody id="budgets-body"></tbody>
+      </table>
+      <p id="no-budgets" class="muted" hidden>No budgets yet. Add one above, e.g. groceries / 300.</p>
+    </section>
+
+    <section id="unbudgeted-card" class="card" hidden>
+      <h2>Spending without a budget</h2>
+      <ul id="unbudgeted" class="totals"></ul>
+      <p class="muted">Add a budget for these categories if you want to track them.</p>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="budgets.js"></script>
+</body>
+</html>

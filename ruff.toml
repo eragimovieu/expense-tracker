@@ -1,0 +1,11 @@
+# Lint settings for both services. CI runs `ruff check services/`.
+line-length = 100
+target-version = "py312"
+
+[lint]
+# pycodestyle, pyflakes, import order, bugbear, pyupgrade
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[lint.isort]
+# Each service imports its own modules by plain name (import db, import service).
+known-first-party = ["app", "config", "db", "migrate", "routes", "service", "utils", "expenses_client"]
